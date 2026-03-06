@@ -1,38 +1,41 @@
-# Define the build directory
+.PHONY: clean setup check serve stop pretty build clean_build
+
 BUILD_DIR = dist
 DEPS_DIR = node_modules
+NGINX = /usr/sbin/nginx
+OPEN = xdg-open
+PORT ?= 4000
+NGINX_CONF = /tmp/nginx_seed.conf
 
 clean:
-	@if [ -d "$(DEPS_DIR)" ]; then \
-		echo "Removing $(DEPS_DIR)..."; \
-		rm -r "$(DEPS_DIR)"; \
-		rm -r "package-lock.json"; \
-	fi
+	@rm -rf $(DEPS_DIR) package-lock.json
 
-# Setup 
 setup: clean
-	@npm i web
+	@npm i
 
-# TS check	
 check:
-	@echo "Typechecking Js"
-	./node_modules/.bin/tsc 
+	@echo "Typechecking JS"
+	@./node_modules/.bin/tsc
 
-# Run server in dev mode
-serve:
-	@npm run serve
+# Dev server: nginx + rollup watch + SSE live-reload
+serve: clean_build
+	@export PORT=$(PORT); envsubst '$$PORT' < $(CURDIR)/nginx.conf > $(NGINX_CONF)
+	@$(NGINX) -c $(NGINX_CONF) -p $(CURDIR)
+	@echo "Serving on http://localhost:$(PORT)"
+	@(while [ ! -f $(BUILD_DIR)/index.html ]; do sleep 0.1; done; $(OPEN) http://localhost:$(PORT) 2>/dev/null) &
+	@trap '$(NGINX) -c $(NGINX_CONF) -p $(CURDIR) -s stop 2>/dev/null; echo "Nginx stopped"' EXIT INT TERM; \
+	DEV=1 npx rollup -c -w
 
-# Run prettier source
+stop:
+	@$(NGINX) -c $(NGINX_CONF) -p $(CURDIR) -s stop 2>/dev/null || true
+	@echo "Nginx stopped"
+
 pretty:
 	@npx prettier ./ --write --cache --log-level=silent
 
-# Build for production
+# Production build
 build: clean_build
-	@npm run build
+	@npx rollup -c
 
-# Clean build directory if it exists
 clean_build:
-	@if [ -d "$(BUILD_DIR)" ]; then \
-		echo "Removing $(BUILD_DIR)..."; \
-		rm -r "$(BUILD_DIR)"; \
-	fi
+	@rm -rf $(BUILD_DIR)

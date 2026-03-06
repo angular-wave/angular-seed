@@ -41,13 +41,8 @@
               </ion-row>
             </ion-grid>
 
-            <ion-fab
-              ng-click="$ctrl.addPhotoToGallery()"
-              vertical="bottom"
-              horizontal="center"
-              slot="fixed"
-            >
-              <ion-fab-button>
+            <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+              <ion-fab-button ng-click="$ctrl.addPhotoToGallery()">
                 <ion-icon name="camera"></ion-icon>
               </ion-fab-button>
             </ion-fab>

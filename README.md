@@ -20,14 +20,26 @@ make setup
 
 ### Run the Application
 
-This project preconfigured the project with [Web Dev Server](https://modern-web.dev/docs/dev-server/overview/), an optimal solution for lightweight and buildless workflows.
-The simplest way to start the server is:
+The dev server uses [nginx](https://nginx.org/) to serve static files from `dist/` with instant live-reload powered by [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). No heavyweight dev server dependencies are required.
 
 ```
-make start
+make serve
 ```
 
-Now open your browser to `localhost:4000/`
+This starts the following:
+
+1. **Rollup** builds the app to `dist/` and watches for source changes
+2. **Nginx** serves `dist/` on `http://localhost:4000` with SPA fallback routing
+3. **SSE live-reload** — a minimal SSE server (embedded in the rollup config, zero dependencies) pushes reload events to the browser on every rebuild
+4. **Nginx `sub_filter`** injects the live-reload `<script>` tag into HTML responses at serve time — the build output stays clean
+
+Your browser will open automatically. When you edit source files, rollup rebuilds and the browser reloads instantly.
+
+To stop nginx manually (if needed):
+
+```
+make stop
+```
 
 [angularts]: https://github.com/Angular-Wave/angular.ts
 
@@ -43,7 +55,19 @@ make build
 This will execute the following tasks:
 
 - Minified HTML with [Rollup Plugin HTML](https://modern-web.dev/docs/building/rollup-plugin-html/)
-- Bundled JS with [Rollup](https://rollupjs.org/) and minified it with terser [Terser](https://terser.org/)
+- Bundled JS with [Rollup](https://rollupjs.org/) and minified with [Terser](https://terser.org/)
 - Bundled and minified CSS with [Lightning CSS](https://lightningcss.dev/)
 
 Your app should be available in `/dist` folder and can then be uploaded to a static server.
+
+### Commands
+
+| Command       | Description                        |
+| ------------- | ---------------------------------- |
+| `make setup`  | Clean install dependencies         |
+| `make serve`  | Dev server with live-reload        |
+| `make build`  | Production build                   |
+| `make stop`   | Stop nginx if still running        |
+| `make check`  | TypeScript type-check              |
+| `make pretty` | Format code with Prettier          |
+| `make clean`  | Remove `node_modules` and lockfile |

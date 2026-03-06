@@ -23,7 +23,6 @@ export class PhotoController {
     });
     const savedImageFile = await this.savePicture(capturedPhoto);
     this.photos.unshift(savedImageFile);
-    this.$scope.$digest();
   }
 
   /**

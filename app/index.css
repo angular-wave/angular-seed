@@ -1,6 +1,6 @@
 /* `ng-cloak` styles to hide angular placeholders */
 @import "./styles/angular.css";
-@import "./styles/modern-normalize.css";
+@import "../node_modules/modern-normalize/modern-normalize.css";
 @import "./styles/fonts.css";
 
 html,

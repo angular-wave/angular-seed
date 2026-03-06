@@ -4,10 +4,6 @@
   "description": "A starter template for AngularTS app",
   "type": "module",
   "scripts": {
-    "serve": "web-dev-server --watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c",
-    "build:watch": "rollup -c -w",
     "prepare": "husky"
   },
   "repository": {
@@ -28,20 +24,19 @@
   "dependencies": {
     "@angular-wave/angular.ts": "latest",
     "@capacitor/camera": "latest",
-    "@capacitor/core": "latest",
+    "@capacitor/core": "^8.2.0",
     "@capacitor/filesystem": "latest",
     "@capacitor/preferences": "latest",
     "@capacitor/splash-screen": "latest",
-    "@ionic/core": "8.0.0",
-    "@ionic/pwa-elements": "^3.3.0",
-    "modern-normalize": "latest",
-    "web": "^0.0.2"
+    "@ionic/core": "8.8.0",
+    "@ionic/pwa-elements": "^3.4.0",
+    "modern-normalize": "latest"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.2.0",
     "@rollup/plugin-commonjs": "latest",
     "@rollup/plugin-node-resolve": "latest",
     "@rollup/plugin-terser": "latest",
-    "@web/dev-server": "latest",
     "@web/rollup-plugin-copy": "latest",
     "@web/rollup-plugin-html": "latest",
     "husky": "latest",
