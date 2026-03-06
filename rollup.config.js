@@ -14,6 +14,64 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.DEV === "1";
 const isWatch = process.argv.includes("-w") || process.argv.includes("--watch");
 
+const defaultInputHtml = [
+  "./index.html",
+  "./apps/todo/todo.html",
+  "./apps/router/router.html",
+  "./apps/ionic/ionic.html",
+];
+
+const defaultCopyPatterns = [
+  "./*.{txt,webmanifest}",
+  "./apps/router/_*.html",
+  "./apps/ionic/assets/**",
+  "./apps/ionic/manifest.json",
+  "./apps/ionic/capacitor.config.json",
+];
+
+function parseListEnv(jsonVar, csvVar, fallback) {
+  const jsonValue = process.env[jsonVar];
+  if (jsonValue) {
+    try {
+      const parsed = JSON.parse(jsonValue);
+      if (
+        Array.isArray(parsed) &&
+        parsed.every((item) => typeof item === "string")
+      ) {
+        return parsed;
+      }
+      throw new Error("Value must be an array of strings");
+    } catch (error) {
+      throw new Error(
+        `${jsonVar} must be a JSON array of strings. ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
+
+  const csvValue = process.env[csvVar];
+  if (csvValue) {
+    return csvValue
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+  }
+
+  return fallback;
+}
+
+const rootDir = process.env.ROLLUP_ROOT_DIR || "./app";
+const outputDir = process.env.ROLLUP_OUTPUT_DIR || "dist";
+const inputHtml = parseListEnv(
+  "ROLLUP_INPUT_HTMLS_JSON",
+  "ROLLUP_INPUT_HTMLS",
+  defaultInputHtml,
+);
+const copyPatterns = parseListEnv(
+  "ROLLUP_COPY_PATTERNS_JSON",
+  "ROLLUP_COPY_PATTERNS",
+  defaultCopyPatterns,
+);
+
 /**
  * Minimal SSE live-reload rollup plugin (zero dependencies).
  * Starts an HTTP server that streams Server-Sent Events.
@@ -57,7 +115,7 @@ function copyIonicEntries() {
   return {
     name: "copy-ionic-entries",
     writeBundle(options) {
-      const outDir = options.dir || "dist";
+      const outDir = options.dir || outputDir;
       const ionicEsm = join(__dirname, "node_modules/@ionic/core/dist/esm");
       // Skip non-hashed files that would collide with rollup output.
       const skip = new Set(["index.js", "loader.js"]);
@@ -74,7 +132,7 @@ function copyIonicEntries() {
 
 const plugins = [
   html({
-    rootDir: "./app",
+    rootDir,
     minify: !isDev,
     flattenOutput: false,
     transformAsset: (_content, filePath) => {
@@ -88,14 +146,8 @@ const plugins = [
     },
   }),
   copy({
-    patterns: [
-      "./*.{txt,webmanifest}",
-      "./apps/router/_*.html",
-      "./apps/ionic/assets/**",
-      "./apps/ionic/manifest.json",
-      "./apps/ionic/capacitor.config.json",
-    ],
-    rootDir: "./app",
+    patterns: copyPatterns,
+    rootDir,
     exclude: ["node_modules"],
   }),
   resolve(),
@@ -106,14 +158,9 @@ const plugins = [
 
 export default [
   {
-    input: [
-      "./index.html",
-      "./apps/todo/todo.html",
-      "./apps/router/router.html",
-      "./apps/ionic/ionic.html",
-    ],
+    input: inputHtml,
     output: {
-      dir: "dist",
+      dir: outputDir,
       entryFileNames: isDev ? "[name].js" : "[name].[hash].js",
     },
     plugins: plugins,

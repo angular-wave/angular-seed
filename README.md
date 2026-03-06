@@ -60,6 +60,24 @@ This will execute the following tasks:
 
 Your app should be available in `/dist` folder and can then be uploaded to a static server.
 
+### Configure Rollup from Make
+
+The build configuration is controlled from `Makefile` and passed to `rollup.config.js` via environment variables:
+
+- `ROLLUP_ROOT_DIR` (default `./app`)
+- `ROLLUP_OUTPUT_DIR` (default `dist`)
+- `ROLLUP_INPUT_HTMLS_JSON` (JSON array of HTML entrypoints)
+- `ROLLUP_COPY_PATTERNS_JSON` (JSON array for `@web/rollup-plugin-copy`)
+
+Example override:
+
+```
+make build \
+  ROLLUP_ROOT_DIR=./my-app \
+  ROLLUP_OUTPUT_DIR=build \
+  ROLLUP_INPUT_HTMLS_JSON='["./index.html","./apps/admin/admin.html"]'
+```
+
 ### Commands
 
 | Command       | Description                        |
