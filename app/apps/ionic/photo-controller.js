@@ -9,6 +9,9 @@ import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 export class PhotoController {
   static $inject = ["$scope"];
 
+  /**
+   * @param {ng.Scope} $scope
+   */
   constructor($scope) {
     /** @type {UserPhoto[]} */
     this.photos = [];

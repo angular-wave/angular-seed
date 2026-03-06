@@ -59,7 +59,7 @@ function copyIonicEntries() {
     writeBundle(options) {
       const outDir = options.dir || "dist";
       const ionicEsm = join(__dirname, "node_modules/@ionic/core/dist/esm");
-      // Skip non-hashed files that would collide with rollup output
+      // Skip non-hashed files that would collide with rollup output.
       const skip = new Set(["index.js", "loader.js"]);
       if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
       for (const file of readdirSync(ionicEsm)) {

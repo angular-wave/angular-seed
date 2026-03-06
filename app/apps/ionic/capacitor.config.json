@@ -1,6 +1,6 @@
 {
-  "appId": "com.example",
-  "appName": "mobile",
+  "appId": "com.angular",
+  "appName": "angular-seed",
   "bundledWebRuntime": false,
   "webDir": "dist",
   "plugins": {

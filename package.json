@@ -23,6 +23,7 @@
   "homepage": "https://github.com/Angular-Wave/angular-seed#readme",
   "dependencies": {
     "@angular-wave/angular.ts": "latest",
+    "@capacitor/android": "^8.2.0",
     "@capacitor/camera": "latest",
     "@capacitor/core": "^8.2.0",
     "@capacitor/filesystem": "latest",
