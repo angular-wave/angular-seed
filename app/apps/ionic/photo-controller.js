@@ -9,7 +9,7 @@ import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 export class PhotoController {
   static $inject = ["$scope"];
 
-  constructor($scope) {
+  constructor(/** @type {any} */ $scope) {
     /** @type {UserPhoto[]} */
     this.photos = [];
     this.$scope = $scope;
@@ -49,6 +49,9 @@ export class PhotoController {
    */
   async readAsBase64(photo) {
     // Fetch the photo, read as a blob, then convert to base64 format
+    if (!photo.webPath) {
+      throw new Error("Photo webPath is undefined");
+    }
     const response = await fetch(photo.webPath);
     const blob = await response.blob();
 

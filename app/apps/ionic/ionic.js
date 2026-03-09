@@ -1,6 +1,6 @@
 import { angular } from "@angular-wave/angular.ts";
-import { PhotoController } from "./photo-controller.js";
-import { defineCustomElements as defineIonic } from "@ionic/core/loader/index.js";
+import { PhotoController } from "./photo-controller";
+import { defineCustomElements as defineIonic } from "@ionic/core/loader/index";
 import { defineCustomElements as definePwa } from "@ionic/pwa-elements/loader";
 import { addIcons } from "ionicons";
 import { camera, images } from "ionicons/icons";
@@ -14,7 +14,7 @@ angular
   .module("app", [])
   .config([
     "$sceProvider",
-    ($sceProvider) => {
+    (/** @type {any} */ $sceProvider) => {
       $sceProvider.enabled(false);
     },
   ])
