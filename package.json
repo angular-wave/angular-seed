@@ -46,16 +46,8 @@
     "globals": "^17.4.0",
     "husky": "latest",
     "lightningcss": "latest",
-    "lint-staged": "latest",
     "prettier": "latest",
     "rollup": "latest",
     "typescript": "latest"
-  },
-  "lint-staged": {
-    "*.{js,mjs,cjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "**/*": "prettier --write --ignore-unknown"
   }
 }
