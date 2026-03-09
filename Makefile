@@ -1,4 +1,4 @@
-.PHONY: clean setup check serve stop pretty build clean_build
+.PHONY: clean setup check lint lint_fix serve stop pretty build clean_build
 
 BUILD_DIR = dist
 DEPS_DIR = node_modules
@@ -16,6 +16,12 @@ setup: clean
 check:
 	@echo "Typechecking JS"
 	@./node_modules/.bin/tsc
+
+lint:
+	@npx eslint .
+
+lint_fix:
+	@npx eslint . --fix
 
 # Dev server: nginx + rollup watch + SSE live-reload
 serve: clean_build

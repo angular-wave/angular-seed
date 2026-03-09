@@ -6,7 +6,6 @@ import { addIcons } from "ionicons";
 import { camera, images } from "ionicons/icons";
 
 addIcons({ camera, images });
-debugger;
 defineIonic(window);
 definePwa(window);
 

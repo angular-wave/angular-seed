@@ -14,12 +14,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.DEV === "1";
 const isWatch = process.argv.includes("-w") || process.argv.includes("--watch");
 
+const LIVE_RELOAD_PORT = 35729;
+
 /**
  * Minimal SSE live-reload rollup plugin (zero dependencies).
  * Starts an HTTP server that streams Server-Sent Events.
  * Every `writeBundle` pushes a "reload" event to every connected browser.
  */
-function liveReloadPlugin(port = 35729) {
+function liveReloadPlugin(port = LIVE_RELOAD_PORT) {
   const clients = new Set();
 
   const server = createServer((req, res) => {
@@ -58,16 +60,20 @@ function copyIonicEntries() {
     name: "copy-ionic-entries",
     writeBundle(options) {
       const outDir = options.dir || "dist";
+
       const ionicEsm = join(__dirname, "node_modules/@ionic/core/dist/esm");
+
       // Skip non-hashed files that would collide with rollup output
       const skip = new Set(["index.js", "loader.js"]);
+
       if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+
       for (const file of readdirSync(ionicEsm)) {
         if (file.endsWith(".js") && !skip.has(file)) {
           cpSync(join(ionicEsm, file), join(outDir, file));
         }
       }
-      console.log("Copied @ionic/core ESM files to " + outDir);
+      console.log(`Copied @ionic/core ESM files to ${outDir}`);
     },
   };
 }
@@ -79,12 +85,15 @@ const plugins = [
     flattenOutput: false,
     transformAsset: (_content, filePath) => {
       if (filePath.endsWith(".css")) {
-        let { code } = bundle({
+        const { code } = bundle({
           filename: filePath,
           minify: !isDev,
         });
+
         return new TextDecoder("utf-8").decode(code);
       }
+
+      return undefined;
     },
   }),
   copy({
@@ -116,6 +125,6 @@ export default [
       dir: "dist",
       entryFileNames: isDev ? "[name].js" : "[name].[hash].js",
     },
-    plugins: plugins,
+    plugins,
   },
 ];

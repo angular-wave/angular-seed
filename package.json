@@ -34,11 +34,16 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.2.0",
+    "@eslint/js": "^9.39.4",
     "@rollup/plugin-commonjs": "latest",
     "@rollup/plugin-node-resolve": "latest",
     "@rollup/plugin-terser": "latest",
     "@web/rollup-plugin-copy": "latest",
     "@web/rollup-plugin-html": "latest",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.4.0",
     "husky": "latest",
     "lightningcss": "latest",
     "lint-staged": "latest",
@@ -47,6 +52,10 @@
     "typescript": "latest"
   },
   "lint-staged": {
+    "*.{js,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
     "**/*": "prettier --write --ignore-unknown"
   }
 }

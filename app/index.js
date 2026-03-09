@@ -8,6 +8,7 @@ angular.module("version", []).controller(
     constructor($scope) {
       this.$scope = $scope;
     }
+
     version = angular.version;
   },
 );

@@ -21,7 +21,9 @@ export class PhotoController {
       source: CameraSource.Camera,
       quality: 100,
     });
+
     const savedImageFile = await this.savePicture(capturedPhoto);
+
     this.photos.unshift(savedImageFile);
   }
 
@@ -32,13 +34,14 @@ export class PhotoController {
   async savePicture(photo) {
     // Convert photo to base64 format, required by Filesystem API to save
     const base64Data = await this.readAsBase64(photo);
-    const fileName = Date.now() + ".jpeg";
+
+    const fileName = `${Date.now()}.jpeg`;
 
     // Use webPath to display the new image instead of base64 since it's
     // already loaded into memory
     return {
       filepath: fileName,
-      base64Data: base64Data,
+      base64Data,
     };
   }
 
@@ -53,6 +56,7 @@ export class PhotoController {
       throw new Error("Photo webPath is undefined");
     }
     const response = await fetch(photo.webPath);
+
     const blob = await response.blob();
 
     return await this.convertBlobToBase64(blob);
@@ -66,6 +70,7 @@ export class PhotoController {
   convertBlobToBase64(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
+
       reader.onerror = reject;
       reader.onload = () => resolve(/** @type {string} */ (reader.result));
       reader.readAsDataURL(blob);
