@@ -60,14 +60,29 @@ This will execute the following tasks:
 
 Your app should be available in `/dist` folder and can then be uploaded to a static server.
 
+### Testing
+
+Tests use [Playwright](https://playwright.dev/) for both **unit** and **e2e** testing. Unit tests run pure logic inside a lightweight browser page (`page.evaluate`), while e2e tests exercise the full app served by nginx.
+
+```
+make test          # run all tests (unit + e2e)
+make test_unit     # unit tests only
+make test_e2e      # e2e tests only (starts dev server automatically)
+```
+
 ### Commands
 
-| Command       | Description                        |
-| ------------- | ---------------------------------- |
-| `make setup`  | Clean install dependencies         |
-| `make serve`  | Dev server with live-reload        |
-| `make build`  | Production build                   |
-| `make stop`   | Stop nginx if still running        |
-| `make check`  | TypeScript type-check              |
-| `make pretty` | Format code with Prettier          |
-| `make clean`  | Remove `node_modules` and lockfile |
+| Command          | Description                             |
+| ---------------- | --------------------------------------- |
+| `make setup`     | Clean install dependencies + Playwright |
+| `make serve`     | Dev server with live-reload             |
+| `make build`     | Production build                        |
+| `make stop`      | Stop nginx if still running             |
+| `make check`     | TypeScript type-check                   |
+| `make lint`      | Lint source with ESLint                 |
+| `make lint_fix`  | Auto-fix lint issues                    |
+| `make pretty`    | Format code with Prettier               |
+| `make test`      | Run all tests (unit + e2e)              |
+| `make test_unit` | Run unit tests only                     |
+| `make test_e2e`  | Run e2e tests only                      |
+| `make clean`     | Remove `node_modules` and lockfile      |

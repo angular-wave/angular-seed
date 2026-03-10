@@ -5,6 +5,9 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 
 export default defineConfig([
   {
+    ignores: ["dist/**", "node_modules/**", "**/*.spec.js", "**/*.test.js"],
+  },
+  {
     files: ["app/**/*.{js,mjs,cjs}"],
     languageOptions: {
       ecmaVersion: "latest",
@@ -138,7 +141,6 @@ export default defineConfig([
       "no-octal": "error",
       "no-unneeded-ternary": "error",
     },
-    ignores: ["**/*.spec.js", "**/*.test.js"],
   },
   {
     files: ["rollup.config.js"],
