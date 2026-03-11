@@ -15,6 +15,7 @@ const isDev = process.env.DEV === "1";
 const isWatch = process.argv.includes("-w") || process.argv.includes("--watch");
 
 const LIVE_RELOAD_PORT = 35729;
+const LIVE_RELOAD_STATE_KEY = "__angularSeedLiveReload";
 
 /**
  * Minimal SSE live-reload rollup plugin (zero dependencies).
@@ -22,27 +23,33 @@ const LIVE_RELOAD_PORT = 35729;
  * Every `writeBundle` pushes a "reload" event to every connected browser.
  */
 function liveReloadPlugin(port = LIVE_RELOAD_PORT) {
-  const clients = new Set();
+  let state = globalThis[LIVE_RELOAD_STATE_KEY];
 
-  const server = createServer((req, res) => {
-    res.writeHead(200, {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Access-Control-Allow-Origin": "*",
+  if (!state || state.port !== port || !state.server.listening) {
+    const clients = new Set();
+    const server = createServer((req, res) => {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+      });
+      clients.add(res);
+      req.on("close", () => clients.delete(res));
     });
-    clients.add(res);
-    req.on("close", () => clients.delete(res));
-  });
 
-  server.listen(port, () =>
-    console.log(`Live-reload SSE server on http://localhost:${port}`),
-  );
+    server.listen(port, () =>
+      console.log(`Live-reload SSE server on http://localhost:${port}`),
+    );
+
+    state = { clients, port, server };
+    globalThis[LIVE_RELOAD_STATE_KEY] = state;
+  }
 
   return {
     name: "live-reload",
     writeBundle() {
-      for (const res of clients) {
+      for (const res of state.clients) {
         res.write("data: reload\n\n");
       }
     },

@@ -5,7 +5,7 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 
 export default defineConfig([
   {
-    ignores: ["dist/**", "node_modules/**", "**/*.spec.js", "**/*.test.js"],
+    ignores: ["dist/**", "**/*.spec.js", "**/*.test.js"],
   },
   {
     files: ["app/**/*.{js,mjs,cjs}"],
