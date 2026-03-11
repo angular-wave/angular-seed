@@ -85,6 +85,18 @@ function copyIonicEntries() {
   };
 }
 
+function onwarn(warning, defaultHandler) {
+  const isIonicPwaElementsThisWarning =
+    warning.code === "THIS_IS_UNDEFINED" &&
+    warning.id?.includes("@ionic/pwa-elements/dist/esm-es5/");
+
+  if (isIonicPwaElementsThisWarning) {
+    return;
+  }
+
+  defaultHandler(warning);
+}
+
 const plugins = [
   html({
     rootDir: "./app",
@@ -128,6 +140,7 @@ export default [
       "./apps/router/router.html",
       "./apps/ionic/ionic.html",
     ],
+    onwarn,
     output: {
       dir: "dist",
       entryFileNames: isDev ? "[name].js" : "[name].[hash].js",

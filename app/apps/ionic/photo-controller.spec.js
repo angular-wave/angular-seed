@@ -10,9 +10,12 @@ test.describe("PhotoController", () => {
           this.$scope = $scope;
         }
       }
+
       const ctrl = new PhotoController({});
+
       return { length: ctrl.photos.length };
     });
+
     expect(result.length).toBe(0);
   });
 
@@ -23,17 +26,21 @@ test.describe("PhotoController", () => {
         convertBlobToBase64(blob) {
           return new Promise((resolve, reject) => {
             const reader = new FileReader();
+
             reader.onerror = reject;
             reader.onload = () => resolve(reader.result);
             reader.readAsDataURL(blob);
           });
         }
       }
+
       const ctrl = new PhotoController();
       const blob = new Blob(["hello"], { type: "text/plain" });
       const base64 = await ctrl.convertBlobToBase64(blob);
+
       return { startsCorrectly: base64.startsWith("data:text/plain;base64,") };
     });
+
     expect(result.startsCorrectly).toBe(true);
   });
 
@@ -47,14 +54,18 @@ test.describe("PhotoController", () => {
           }
         }
       }
+
       const ctrl = new PhotoController();
+
       try {
         await ctrl.readAsBase64({});
+
         return { threw: false };
       } catch (e) {
         return { threw: true, message: e.message };
       }
     });
+
     expect(result.threw).toBe(true);
     expect(result.message).toBe("Photo webPath is undefined");
   });
@@ -66,20 +77,25 @@ test.describe("PhotoController", () => {
         async readAsBase64() {
           return "data:image/jpeg;base64,fakedata";
         }
+
         async savePicture(photo) {
           const base64Data = await this.readAsBase64(photo);
           const fileName = `${Date.now()}.jpeg`;
+
           return { filepath: fileName, base64Data };
         }
       }
+
       const ctrl = new PhotoController();
       const saved = await ctrl.savePicture({ webPath: "http://example.com" });
+
       return {
         hasFilepath: typeof saved.filepath === "string",
         endsWithJpeg: saved.filepath.endsWith(".jpeg"),
         hasBase64: saved.base64Data === "data:image/jpeg;base64,fakedata",
       };
     });
+
     expect(result.hasFilepath).toBe(true);
     expect(result.endsWithJpeg).toBe(true);
     expect(result.hasBase64).toBe(true);
