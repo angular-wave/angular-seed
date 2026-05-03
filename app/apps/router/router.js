@@ -1,7 +1,7 @@
 import { angular } from "@angular-wave/angular.ts";
 
 /**
- * @typedef {ng.StateDeclaration & import("@angular-wave/angular.ts/@types/router/state/interface.ts").ViewDeclaration} StateConfig
+ * @typedef {ng.StateDeclaration} StateConfig
  */
 
 angular.module("router", []).config([
