@@ -17,7 +17,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
-    "downlevelIteration": true,
     "incremental": true,
     "lib": ["ESNext", "DOM"],
     "sourceMap": false,
