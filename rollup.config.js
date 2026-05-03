@@ -16,6 +16,8 @@ const isWatch = process.argv.includes("-w") || process.argv.includes("--watch");
 
 const LIVE_RELOAD_PORT = 35729;
 const LIVE_RELOAD_STATE_KEY = "__angularSeedLiveReload";
+const LIVE_RELOAD_SCRIPT =
+  '<script>new EventSource("/sse").onmessage=()=>location.reload()</script>';
 
 /**
  * Minimal SSE live-reload rollup plugin (zero dependencies).
@@ -51,6 +53,30 @@ function liveReloadPlugin(port = LIVE_RELOAD_PORT) {
     writeBundle() {
       for (const res of state.clients) {
         res.write("data: reload\n\n");
+      }
+    },
+  };
+}
+
+function liveReloadHtmlPlugin() {
+  return {
+    name: "live-reload-html",
+    generateBundle(_options, bundle) {
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== "asset" || !asset.fileName.endsWith(".html")) {
+          continue;
+        }
+
+        const source = String(asset.source);
+
+        if (source.includes(LIVE_RELOAD_SCRIPT)) {
+          continue;
+        }
+
+        asset.source = source.replace(
+          "</body>",
+          `${LIVE_RELOAD_SCRIPT}</body>`,
+        );
       }
     },
   };
@@ -128,7 +154,11 @@ const plugins = [
   }),
   resolve(),
   commonjs(),
-  ...(isDev && isWatch ? [liveReloadPlugin()] : isDev ? [] : [terser()]),
+  ...(isDev && isWatch
+    ? [liveReloadPlugin(), liveReloadHtmlPlugin()]
+    : isDev
+      ? []
+      : [terser()]),
   copyIonicEntries(),
 ];
 

@@ -2,11 +2,13 @@
 
 BUILD_DIR = dist
 DEPS_DIR = node_modules
-NGINX = /usr/sbin/nginx
+TOOLS_DIR = .tools
+CADDY ?= $(TOOLS_DIR)/bin/caddy
+CADDY_VERSION ?= 2.10.2
 OPEN = xdg-open
 OPEN_BROWSER ?= 1
 PORT ?= 4000
-NGINX_CONF = /tmp/nginx_seed.conf
+CADDY_PID_FILE = /tmp/angular-seed-caddy.pid
 LIVE_RELOAD_PORT ?= 35729
 ROLLUP_PID_FILE = /tmp/angular-seed-rollup.pid
 
@@ -16,6 +18,22 @@ clean:
 setup: clean
 	@npm i
 	@npx playwright install --with-deps chromium
+	@mkdir -p $(TOOLS_DIR)/bin
+	@if ! command -v $(CADDY) >/dev/null 2>&1; then \
+		os="$$(uname -s | tr '[:upper:]' '[:lower:]')"; \
+		arch="$$(uname -m)"; \
+		case "$$arch" in \
+			x86_64|amd64) arch="amd64" ;; \
+			aarch64|arm64) arch="arm64" ;; \
+			*) echo "Unsupported Caddy architecture: $$arch"; exit 1 ;; \
+		esac; \
+		url="https://github.com/caddyserver/caddy/releases/download/v$(CADDY_VERSION)/caddy_$(CADDY_VERSION)_$${os}_$${arch}.tar.gz"; \
+		tmp_dir="$$(mktemp -d)"; \
+		curl -fsSL "$$url" | tar -xz -C "$$tmp_dir" caddy; \
+		mv "$$tmp_dir/caddy" "$(CADDY)"; \
+		chmod +x "$(CADDY)"; \
+		rm -rf "$$tmp_dir"; \
+	fi
 
 check:
 	@echo "Typechecking JS"
@@ -24,23 +42,28 @@ check:
 lint:
 	@npx eslint . --fix
 
-# Dev server: nginx + rollup watch + SSE live-reload
+# Dev server: Caddy + rollup watch + SSE live-reload
 serve: clean_build
+	@command -v $(CADDY) >/dev/null 2>&1 || { echo "Caddy is required. Run make setup or set CADDY=/path/to/caddy."; exit 1; }
 	@trap 'status=$$?; \
 	if [ -f $(ROLLUP_PID_FILE) ]; then \
 		kill "$$(cat $(ROLLUP_PID_FILE))" 2>/dev/null || true; \
 		rm -f $(ROLLUP_PID_FILE); \
 		echo "Rollup watch stopped"; \
 	fi; \
-	$(NGINX) -c $(NGINX_CONF) -p $(CURDIR) -s stop 2>/dev/null; \
-	echo "Nginx stopped"; \
+	if [ -f $(CADDY_PID_FILE) ]; then \
+		kill "$$(cat $(CADDY_PID_FILE))" 2>/dev/null || true; \
+		rm -f $(CADDY_PID_FILE); \
+		echo "Caddy stopped"; \
+	fi; \
 	exit $$status' EXIT INT TERM; \
 	DEV=1 npx rollup -c -w & \
 	rollup_pid=$$!; \
 	echo $$rollup_pid > $(ROLLUP_PID_FILE); \
 	while [ ! -f $(BUILD_DIR)/index.html ]; do sleep 0.1; done; \
-	export PORT=$(PORT); envsubst '$$PORT' < $(CURDIR)/nginx.conf > $(NGINX_CONF); \
-	$(NGINX) -c $(NGINX_CONF) -p $(CURDIR); \
+	PORT=$(PORT) LIVE_RELOAD_PORT=$(LIVE_RELOAD_PORT) $(CADDY) run --config $(CURDIR)/Caddyfile --adapter caddyfile & \
+	caddy_pid=$$!; \
+	echo $$caddy_pid > $(CADDY_PID_FILE); \
 	echo "Serving on http://localhost:$(PORT)"; \
 	if [ "$(OPEN_BROWSER)" = "1" ]; then $(OPEN) http://localhost:$(PORT) 2>/dev/null & fi; \
 	wait $$rollup_pid
@@ -64,8 +87,20 @@ stop:
 			echo "Live-reload server stopped"; \
 		fi; \
 	fi
-	@$(NGINX) -c $(NGINX_CONF) -p $(CURDIR) -s stop 2>/dev/null || true
-	@echo "Nginx stopped"
+	@if [ -f $(CADDY_PID_FILE) ]; then \
+		kill "$$(cat $(CADDY_PID_FILE))" 2>/dev/null || true; \
+		rm -f $(CADDY_PID_FILE); \
+		echo "Caddy stopped"; \
+	else \
+		echo "Caddy not running"; \
+	fi
+	@if command -v lsof >/dev/null 2>&1; then \
+		caddy_pid="$$(lsof -ti tcp:$(PORT) 2>/dev/null)"; \
+		if [ -n "$$caddy_pid" ]; then \
+			kill $$caddy_pid 2>/dev/null || true; \
+			echo "Server on port $(PORT) stopped"; \
+		fi; \
+	fi
 
 pretty:
 	@npx prettier ./ --write --cache --log-level=silent

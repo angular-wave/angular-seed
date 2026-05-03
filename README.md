@@ -18,9 +18,11 @@ For inspiration, the seed comes bundled with the following apps under `apps` fol
 make setup
 ```
 
+This also installs a local Caddy binary under `.tools/bin/`.
+
 ### Run the Application
 
-The dev server uses [nginx](https://nginx.org/) to serve static files from `dist/` with instant live-reload powered by [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). No heavyweight dev server dependencies are required.
+The dev server uses [Caddy](https://caddyserver.com/) to serve static files from `dist/` with instant live-reload powered by [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). No heavyweight JavaScript dev server dependencies are required.
 
 ```
 make serve
@@ -29,13 +31,13 @@ make serve
 This starts the following:
 
 1. **Rollup** builds the app to `dist/` and watches for source changes
-2. **Nginx** serves `dist/` on `http://localhost:4000` with SPA fallback routing
+2. **Caddy** serves `dist/` on `http://localhost:4000` with SPA fallback routing
 3. **SSE live-reload** — a minimal SSE server (embedded in the rollup config, zero dependencies) pushes reload events to the browser on every rebuild
-4. **Nginx `sub_filter`** injects the live-reload `<script>` tag into HTML responses at serve time — the build output stays clean
+4. **Rollup dev HTML transform** injects the live-reload `<script>` tag only for watch builds — production output stays clean
 
 Your browser will open automatically. When you edit source files, rollup rebuilds and the browser reloads instantly.
 
-To stop nginx manually (if needed):
+To stop Caddy manually (if needed):
 
 ```
 make stop
@@ -62,7 +64,7 @@ Your app should be available in `/dist` folder and can then be uploaded to a sta
 
 ### Testing
 
-Tests use [Playwright](https://playwright.dev/) for both **unit** and **e2e** testing. Unit tests run pure logic inside a lightweight browser page (`page.evaluate`), while e2e tests exercise the full app served by nginx.
+Tests use [Playwright](https://playwright.dev/) for both **unit** and **e2e** testing. Unit tests run pure logic inside a lightweight browser page (`page.evaluate`), while e2e tests exercise the full app served by Caddy.
 
 ```
 make test          # run all tests (unit + e2e)
@@ -77,7 +79,7 @@ make test_e2e      # e2e tests only (starts dev server automatically)
 | `make setup`     | Clean install dependencies + Playwright |
 | `make serve`     | Dev server with live-reload             |
 | `make build`     | Production build                        |
-| `make stop`      | Stop nginx if still running             |
+| `make stop`      | Stop Caddy if still running             |
 | `make check`     | TypeScript type-check                   |
 | `make lint`      | Lint source with ESLint                 |
 | `make lint_fix`  | Auto-fix lint issues                    |
