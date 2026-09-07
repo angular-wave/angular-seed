@@ -7,4 +7,6 @@ import TodoController from "./todo-ctl.js";
  * Its a great way to inject custom DOM behaviour into your server-rendered views.
  */
 
-angular.module("todo", []).controller("TodoCtrl", TodoController);
+angular.createModule("todo", []).controller("TodoCtrl", TodoController);
+
+angular.init(document);

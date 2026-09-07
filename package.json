@@ -22,18 +22,20 @@
   },
   "homepage": "https://github.com/Angular-Wave/angular-seed#readme",
   "dependencies": {
+    "@angular-wave/angular.css": "latest",
     "@angular-wave/angular.ts": "latest",
     "@capacitor/camera": "latest",
-    "@capacitor/core": "^8.2.0",
+    "@capacitor/core": "^8.5.1",
     "@capacitor/filesystem": "latest",
     "@capacitor/preferences": "latest",
     "@capacitor/splash-screen": "latest",
     "@ionic/core": "8.8.0",
     "@ionic/pwa-elements": "^3.4.0",
-    "modern-normalize": "latest"
+    "modern-normalize": "latest",
+    "playwright": "^1.63.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.2.0",
+    "@capacitor/cli": "^8.4.3",
     "@eslint/js": "^9.39.4",
     "@playwright/test": "^1.58.2",
     "@rollup/plugin-commonjs": "latest",

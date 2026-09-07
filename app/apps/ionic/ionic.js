@@ -23,13 +23,10 @@ pwaReady.then((ready) => {
 });
 
 const appModule = angular
-  .module("app", [])
-  .config([
-    "$sceProvider",
-    (/** @type {any} */ $sceProvider) => {
-      $sceProvider.enabled(false);
-    },
-  ])
+  .createModule("app", [])
+  .config({
+    $sce: { enabled: false },
+  })
   .controller("PhotoController", PhotoController);
 
 let hasBootstrapped = false;
