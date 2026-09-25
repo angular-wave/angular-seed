@@ -21,5 +21,3 @@ angular.createModule("router", []).router([
     templateUrl: "/apps/router/_home.html",
   },
 ]);
-
-angular.init(document);

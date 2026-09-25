@@ -7,5 +7,3 @@ angular.createModule("version", [angularCssModuleName]).controller(
     version = angular.version;
   },
 );
-
-angular.init(document);

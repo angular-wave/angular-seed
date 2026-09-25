@@ -8,5 +8,3 @@ import TodoController from "./todo-ctl.js";
  */
 
 angular.createModule("todo", []).controller("TodoCtrl", TodoController);
-
-angular.init(document);
